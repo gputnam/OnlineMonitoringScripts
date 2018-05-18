@@ -56,6 +56,5 @@ while True:
     if parsed is not None:
         (message, timestamp) = encode_redis_message(parsed)
         r.zadd("RECENT_WARNINGS", message, timestamp)
-        print "Sent to Redis"
     
 
