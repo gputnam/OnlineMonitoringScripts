@@ -3,8 +3,14 @@ import time
 import datetime
 import redis
 
+REDIS_HOST = "lariat-daq01.fnal.gov"
+REDIS_PORT = 6379
+
+UDP_HOST = "lariat-daq04.fnal.gov"
+UDP_PORT = 30001
+
 message_senders = ["DaqDecoder:daq@"]
-r = redis.Redis("lariat-daq01.fnal.gov", 6379)
+r = redis.Redis(REDIS_HOST, REDIS_PORT)
 
 def parse_larsoft_message(message):
     data = message.split("|")
@@ -42,13 +48,10 @@ def encode_redis_message(parsed):
     message = "%(level)s at %(time)s Run %(run)i Subrun %(subrun)i Event %(event)i:\n%(type)s:\n%(content)s" % message_param
     return (message, int(parsed["timestamp"]))
 
-UDP_PORT = 30001
-UDP_IP = "lariat-daq04.fnal.gov"
-
 sock = socket.socket(socket.AF_INET, # Internet
                      socket.SOCK_DGRAM) # UDP
 
-sock.bind((UDP_IP, UDP_PORT))
+sock.bind((UDP_HOST, UDP_PORT))
 
 while True:
     data, addr = sock.recvfrom(1024) # buffer size is 1024 bytes
