@@ -2,6 +2,7 @@ import socket
 import time
 import datetime
 import redis
+import json
 
 REDIS_HOST = "lariat-daq01.fnal.gov"
 REDIS_PORT = 6379
@@ -46,7 +47,7 @@ def encode_redis_message(parsed):
         "content": parsed["content"]
     }
     message = "%(level)s at %(time)s Run %(run)i Subrun %(subrun)i Event %(event)i:\n%(type)s:\n%(content)s" % message_param
-    return (message, int(parsed["timestamp"]))
+    return message
 
 sock = socket.socket(socket.AF_INET, # Internet
                      socket.SOCK_DGRAM) # UDP
@@ -57,7 +58,7 @@ while True:
     data, addr = sock.recvfrom(1024) # buffer size is 1024 bytes
     parsed = parse_larsoft_message(data)
     if parsed is not None:
-        (message, timestamp) = encode_redis_message(parsed)
-        r.zadd("RECENT_WARNINGS", message, timestamp)
+        r.zadd("WARNINGS", json.dumps(parsed), parsed["timestamp"])
+        print "Sent warning to Redis:\n%s" % encode_redis_message(parsed)
     
 
