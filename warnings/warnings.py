@@ -3,15 +3,9 @@ import time
 import datetime
 import redis
 import json
-
-REDIS_HOST = "lariat-daq01.fnal.gov"
-REDIS_PORT = 6379
-
-UDP_HOST = "lariat-daq04.fnal.gov"
-UDP_PORT = 30001
+import argparse
 
 message_senders = ["DaqDecoder:daq@"]
-r = redis.Redis(REDIS_HOST, REDIS_PORT)
 
 def parse_larsoft_message(message):
     data = message.split("|")
@@ -49,16 +43,36 @@ def encode_redis_message(parsed):
     message = "%(level)s at %(time)s Run %(run)i Subrun %(subrun)i Event %(event)i:\n%(type)s:\n%(content)s" % message_param
     return message
 
-sock = socket.socket(socket.AF_INET, # Internet
+def main(args):
+    r = redis.Redis(args.redis["host"], args.redis["port"])
+
+    sock = socket.socket(socket.AF_INET, # Internet
                      socket.SOCK_DGRAM) # UDP
+    sock.bind((args.udp["host"], args.udp["port"]))
 
-sock.bind((UDP_HOST, UDP_PORT))
+    while True:
+        data, addr = sock.recvfrom(1024) # buffer size is 1024 bytes
+        parsed = parse_larsoft_message(data)
+        if parsed is not None:
+            r.zadd("WARNINGS", json.dumps(parsed), parsed["timestamp"])
+            print "Sent warning to Redis:\n%s" % encode_redis_message(parsed)
 
-while True:
-    data, addr = sock.recvfrom(1024) # buffer size is 1024 bytes
-    parsed = parse_larsoft_message(data)
-    if parsed is not None:
-        r.zadd("WARNINGS", json.dumps(parsed), parsed["timestamp"])
-        print "Sent warning to Redis:\n%s" % encode_redis_message(parsed)
+def host_and_port(arg):
+    data = arg.split(":")
+    ret = {
+        "host": data[0],
+        "port": int(data[1])
+    }
+    return ret
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-r", "--redis", type=host_and_port, default="localhost:6379")
+    parser.add_argument("-u", "--udp", type=host_and_port, default="localhost:30001")
+    parser.add_argument("-v", "--verbose", action="store_true")
+
+    main(parser.parse_args())
+
     
 
