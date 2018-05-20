@@ -5,7 +5,7 @@ import redis
 import json
 import argparse
 
-message_senders = ["DaqDecoder:daq@"]
+message_senders = ["DaqDecoder:daq@", "OnlineAnalysis:OnlineAnalysis@"]
 
 def parse_larsoft_message(message):
     data = message.split("|")
