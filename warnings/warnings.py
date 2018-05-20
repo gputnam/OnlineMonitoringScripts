@@ -55,7 +55,8 @@ def main(args):
         parsed = parse_larsoft_message(data)
         if parsed is not None:
             r.zadd("WARNINGS", json.dumps(parsed), parsed["timestamp"])
-            print "Sent warning to Redis:\n%s" % encode_redis_message(parsed)
+            if args.verbose
+                print "Sent warning to Redis:\n%s" % encode_redis_message(parsed)
 
 def host_and_port(arg):
     data = arg.split(":")
