@@ -1,4 +1,3 @@
-import ROOT
 import subprocess
 
 path_to_fcl_config = "fragment_to_digit.fcl"
@@ -9,6 +8,8 @@ def digits_file_name(fragments_file_name):
 
 # given the path to a fragments file, gnerates an art root file
 def process(fragments_file_loc):
+    return (0, "")
+
     digit_file_loc = digits_file_name(fragments_file_loc)
 
     # setup command

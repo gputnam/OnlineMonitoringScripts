@@ -1,4 +1,5 @@
 import logging
+import time
 from watchdog.observers import Observer
 
 import file_handler
@@ -14,6 +15,7 @@ if __name__ == "__main__":
     # setup observer for file system changes
     observer = Observer()
     observer.schedule(event_handler, file_handler.src_file_dir) 
+    observer.start()
   
     # Sleep Forever
     try:
