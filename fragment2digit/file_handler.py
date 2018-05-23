@@ -9,8 +9,12 @@ from watchdog.events import PatternMatchingEventHandler
 import fragment2digit
 
 # define constants
-src_file_dir = "/daqdata/dropbox"
-src_file_pattern = "/*"
+#src_file_dir = "/daqdata/dropbox"
+src_file_dir = "/home/nfs/sbnddqm/SBND_DAQ/test_fragment_to_digit/fragment"
+src_file_pattern = "/*.root"
+
+# setup logging
+logger = logging.getLogger("DigitsFileHandler")
 
 # Class which monitors patterns for file events and processes them
 # Inherits from PatternMatchingEventHandler to define how process() works
