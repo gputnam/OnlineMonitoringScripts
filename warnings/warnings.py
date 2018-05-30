@@ -52,7 +52,11 @@ def main(args):
 
     while True:
         data, addr = sock.recvfrom(1024) # buffer size is 1024 bytes
-        parsed = parse_larsoft_message(data)
+        try:
+            parsed = parse_larsoft_message(data)
+        except:
+            print "Unable to parse message:\n%s\n" % data
+            continue
         if parsed is not None:
             r.zadd("WARNINGS", json.dumps(parsed), parsed["timestamp"])
             if args.verbose:
