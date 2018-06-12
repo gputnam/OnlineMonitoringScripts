@@ -10,8 +10,8 @@ import fragment2digit
 
 # define constants
 #src_file_dir = "/daqdata/dropbox"
-src_file_dir = "/home/nfs/sbnddqm/SBND_DAQ/test_fragment_to_digit/fragment"
-src_file_pattern = "/*.root"
+src_file_dir = "/home/nfs/sbnddqm/SBND_DAQ/test_fragment_to_digit/fragment/"
+src_file_pattern = "sbnddqm*.root"
 
 # setup logging
 logger = logging.getLogger("DigitsFileHandler")
