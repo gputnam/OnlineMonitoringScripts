@@ -61,7 +61,7 @@ def main(args):
         if parsed is not None:
             r.zadd("WARNINGS", json.dumps(parsed), parsed["timestamp"])
             if args.verbose:
-                logging.info("Sent warning to Redis:\n%s" % encode_redis_message(parsed))
+                logging.info("Sent message to Redis:\n%s" % encode_redis_message(parsed))
 
 def host_and_port(arg):
     data = arg.split(":")
@@ -80,6 +80,7 @@ if __name__ == "__main__":
     parser.add_argument("-v", "--verbose", action="store_true")
     parser.add_argument("-l", "--log_file", default=None)
 
+    args = parser.parse_args()
     # setup logging
     if args.log_file is None:
         # use stdout by default
@@ -95,7 +96,7 @@ if __name__ == "__main__":
 	    format='%(asctime)s - %(message)s',
 	    datefmt='%Y-%m-%d %H:%M:%S')
         
-    main(parser.parse_args())
+    main(args)
 
     
 
