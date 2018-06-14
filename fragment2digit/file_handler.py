@@ -6,12 +6,10 @@ from logging.handlers import RotatingFileHandler
 import watchdog
 from watchdog.events import PatternMatchingEventHandler
 
-import fragment2digit
+import run_fhicl
 
 # define constants
-#src_file_dir = "/daqdata/dropbox"
-src_file_dir = "/home/nfs/sbnddqm/SBND_DAQ/test_fragment_to_digit/fragment/"
-src_file_pattern = "sbnddqm*.root"
+src_file_pattern = "sbnd*.root"
 
 # setup logging
 logger = logging.getLogger("DigitsFileHandler")
@@ -20,7 +18,12 @@ logger = logging.getLogger("DigitsFileHandler")
 # Inherits from PatternMatchingEventHandler to define how process() works
 # Idea stolen from Johnny Ho's DQM code
 class FileHandler(PatternMatchingEventHandler):
-    patterns = [src_file_dir + src_file_pattern]
+    #def set_src_file_dir(self, src_file_dir):
+    #def set_fhicl_list(self, fhicl_list):
+    def __init__(self, fhicl_list, src_file_dir):
+        self.fhicl_list = fhicl_list
+        self.input_patterns = [src_file_dir + src_file_pattern]
+        super(FileHandler, self).__init__(self.input_patterns)
 
     def log(self, event):
         log_message = '%s file: %s' % (
@@ -41,9 +44,11 @@ class FileHandler(PatternMatchingEventHandler):
             src_file_path = event.dest_path
         else:
             src_file_path = event.src_path
-        (code, message) = fragment2digit.process(src_file_path)
-         # log output from fragment -> digit converter
-        logger.info("Ran conversion with return code %i.\nMessage:\n%s" % (code, message))
+        sub_process_infos = run_fhicl.process(src_file_path, self.fhicl_list)
+  
+        for (code, message) in sub_process_infos:
+            # log output from fragment -> digit converter
+            logger.info("Ran with return code %i.\nMessage:\n%s" % (code, message))
 
 
     def on_created(self, event):
