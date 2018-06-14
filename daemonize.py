@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# runs a script as a daemon
+# should be run as a daemon
 # if the script fails, waits a second and then restarts
 import sys
 import os
