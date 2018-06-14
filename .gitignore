@@ -1,2 +1,4 @@
 *.pyc
-/env/
+env/
+/virtualenv-16.0.0/
+*.sh
