@@ -4,6 +4,7 @@ import datetime
 import redis
 import json
 import argparse
+import logging
 
 message_senders = ["DaqDecoder:daq@", "OnlineAnalysis:OnlineAnalysis@"]
 
@@ -55,12 +56,12 @@ def main(args):
         try:
             parsed = parse_larsoft_message(data)
         except:
-            print "Unable to parse message:\n%s\n" % data
+            logging.warning("Unable to parse message:\n%s\n" % data)
             continue
         if parsed is not None:
             r.zadd("WARNINGS", json.dumps(parsed), parsed["timestamp"])
             if args.verbose:
-                print "Sent warning to Redis:\n%s" % encode_redis_message(parsed)
+                logging.info("Sent warning to Redis:\n%s" % encode_redis_message(parsed))
 
 def host_and_port(arg):
     data = arg.split(":")
@@ -72,11 +73,28 @@ def host_and_port(arg):
 
 
 if __name__ == "__main__":
+    # argument parsing
     parser = argparse.ArgumentParser()
     parser.add_argument("-r", "--redis", type=host_and_port, default="localhost:6379")
     parser.add_argument("-u", "--udp", type=host_and_port, default="localhost:30001")
     parser.add_argument("-v", "--verbose", action="store_true")
+    parser.add_argument("-l", "--log_file", default=None)
 
+    # setup logging
+    if args.log_file is None:
+        # use stdout by default
+        logging.basicConfig(
+	    stream=sys.stdout,
+	    level=logging.INFO,
+	    format='%(asctime)s - %(message)s',
+	    datefmt='%Y-%m-%d %H:%M:%S')
+    else:
+        logging.basicConfig(
+            filename=args.log_file,
+	    level=logging.INFO,
+	    format='%(asctime)s - %(message)s',
+	    datefmt='%Y-%m-%d %H:%M:%S')
+        
     main(parser.parse_args())
 
     
